@@ -1,8 +1,8 @@
-from aily_sdk.util.channel_context import ChannelContext
+from aily_sdk.util.channel_context import parse_channel_context
 
 
 def main(arg1):
-    cc = ChannelContext(arg1, mock_data={
+    cc = parse_channel_context(arg1, mock_data={
         'sender_id': 'developer_id'
     })
     print(cc.sender_id)
