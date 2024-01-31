@@ -2,7 +2,7 @@ import json
 
 from aily_sdk.openapi.data import DataClient
 
-data_api = DataClient(json.load(open('.env.json'))['user_access_token'])
+data_api = DataClient(json.load(open('../../.env.json'))['user_access_token'])
 
 # 准备查询参数
 query_params = {

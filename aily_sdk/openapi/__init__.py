@@ -25,4 +25,5 @@ class OpenAPIClient:
         if headers:
             _headers.update(headers)
         resp = requests.post(url, headers=_headers, json=data)
+        print(resp.content)
         return resp.json()

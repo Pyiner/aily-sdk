@@ -2,7 +2,7 @@ import json
 
 from aily_sdk.openapi.meta import MetaClient
 
-meta_api = MetaClient(json.load(open('.env.json'))['user_access_token'])
+meta_api = MetaClient(json.load(open('../../.env.json'))['user_access_token'])
 
 # 准备查询参数
 query_params = {
