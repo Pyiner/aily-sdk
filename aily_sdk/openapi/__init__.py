@@ -1,3 +1,5 @@
+import logging
+
 import requests
 
 
@@ -14,7 +16,7 @@ class OpenAPIClient:
             _headers.update(headers)
         resp = requests.get(url, headers=_headers, json=data, params=query)
 
-        print(resp.content)
+        print(f'logid= {resp.headers["X-Tt-Logid"]} content= {resp.content}')
         return resp.json()
 
     def post(self, url, headers=None, data=None):
@@ -25,5 +27,5 @@ class OpenAPIClient:
         if headers:
             _headers.update(headers)
         resp = requests.post(url, headers=_headers, json=data)
-        print(resp.content)
+        print(f'logid= {resp.headers["X-Tt-Logid"]} content= {resp.content}')
         return resp.json()
