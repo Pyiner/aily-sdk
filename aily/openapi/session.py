@@ -3,7 +3,7 @@ import pprint
 from dataclasses import dataclass
 from typing import Optional
 
-from aily_sdk.openapi import OpenAPIClient
+from aily.openapi import OpenAPIClient
 
 
 @dataclass

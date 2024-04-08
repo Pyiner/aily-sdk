@@ -1,9 +1,4 @@
-import json
-
-from aily_sdk.openapi import OpenAPIClient
-
-
-class MessageResult:
+class CardMessageResult:
     def __init__(self, result):
         self.code = result['code']
         self.msg = result['msg']
@@ -13,7 +8,7 @@ class MessageResult:
             self.session_id = result['data']['session_id']
 
 
-class MessageClient:
+class CardMessageClient:
     def __init__(self, client, session):
         self.client = client
         self.session = session

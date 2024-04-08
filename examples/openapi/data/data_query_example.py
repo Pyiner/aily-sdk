@@ -1,6 +1,6 @@
 import json
 
-from aily_sdk.openapi.data import DataClient
+from aily.openapi.data import DataClient
 
 data_api = DataClient(json.load(open('../../.env.json'))['user_access_token'])
 

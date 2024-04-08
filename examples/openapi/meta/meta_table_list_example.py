@@ -1,6 +1,6 @@
 import json
 
-from aily_sdk.openapi.meta import MetaClient
+from aily.openapi.meta import MetaClient
 
 meta_api = MetaClient(json.load(open('../../.env.json'))['user_access_token'])
 

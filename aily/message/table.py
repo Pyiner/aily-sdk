@@ -1,5 +1,5 @@
-from aily_sdk.message.record import MetaModel
-from aily_sdk.message.utils import format_js_value
+from aily.message.record import MetaModel
+from aily.message.utils import format_js_value
 
 
 class Table(metaclass=MetaModel):

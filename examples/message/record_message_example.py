@@ -1,5 +1,5 @@
-from aily_sdk.message.field import NumberField, BooleanField, DateField, OptionsField, StringField
-from aily_sdk.message.record import Record
+from aily.message.field import NumberField, BooleanField, DateField, OptionsField, StringField
+from aily.message.record import Record
 
 
 class PersonRecord(Record):

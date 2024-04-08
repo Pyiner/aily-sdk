@@ -1,6 +1,6 @@
 import json
 
-from aily_sdk.openapi import OpenAPIClient
+from aily.openapi import OpenAPIClient
 
 
 class DataResult:

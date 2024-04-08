@@ -1,4 +1,4 @@
-from aily_sdk.util.channel_context import parse_channel_context
+from aily.util.channel_context import parse_channel_context
 
 
 def main(arg1):

@@ -2,8 +2,8 @@ import json
 import pprint
 import time
 
-from aily_sdk.openapi.session import Session
-from aily_sdk.openapi import OpenAPIClient
+from aily.openapi.session import Session
+from aily.openapi import OpenAPIClient
 
 client = OpenAPIClient(json.load(open('../../.env.json'))['user_access_token'])
 

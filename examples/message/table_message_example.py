@@ -1,5 +1,5 @@
-from aily_sdk.message.field import NumberField, BooleanField, DateField, OptionsField, StringField
-from aily_sdk.message.table import Table
+from aily.message.field import NumberField, BooleanField, DateField, OptionsField, StringField
+from aily.message.table import Table
 
 
 class TableDemo(Table):

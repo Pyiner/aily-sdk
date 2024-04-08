@@ -1,6 +1,5 @@
-import logging
-
 import requests
+from loguru import logger
 
 
 class OpenAPIClient:
@@ -16,7 +15,7 @@ class OpenAPIClient:
             _headers.update(headers)
         resp = requests.get(url, headers=_headers, json=data, params=query)
 
-        print(f'logid= {resp.headers["X-Tt-Logid"]} content= {resp.content}')
+        logger.info(f'logid= {resp.headers["X-Tt-Logid"]} content= {resp.content}')
         return resp.json()
 
     def post(self, url, headers=None, data=None):
@@ -27,5 +26,5 @@ class OpenAPIClient:
         if headers:
             _headers.update(headers)
         resp = requests.post(url, headers=_headers, json=data)
-        print(f'logid= {resp.headers["X-Tt-Logid"]} content= {resp.content}')
+        logger.info(f'logid= {resp.headers["X-Tt-Logid"]} content= {resp.content}')
         return resp.json()

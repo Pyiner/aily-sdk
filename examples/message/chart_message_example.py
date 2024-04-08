@@ -1,4 +1,4 @@
-from aily_sdk.message.chart import LineChart, BarChart, CommonChart, PieChart
+from aily.message.chart import LineChart, BarChart, CommonChart, PieChart
 
 bar_chart_data = [
     {"x": 1, "y": 2, "type": "飞书"},
