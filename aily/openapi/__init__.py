@@ -57,15 +57,22 @@ class OpenAPIClient:
         resp = requests.get(url, headers=_headers, json=data, params=query)
 
         logger.info(f'logid= {resp.headers["X-Tt-Logid"]} content= {resp.content}')
+
+        if resp.json()['code'] != 0:
+            logger.error(f'response = {resp.json()}')
+            raise Exception(f'OpenAPI 错误:{resp.json()}')
         return resp.json()
 
-    def post(self, url, headers=None, data=None, query=None):
+    def post(self, url, headers=None, data=None, query=None, files=None):
         _headers = {
             'Authorization': f'Bearer {self.token}',
             'Content-Type': 'application/json',
         }
         if headers:
             _headers.update(headers)
-        resp = requests.post(url, headers=_headers, json=data, params=query)
+        resp = requests.post(url, headers=_headers, json=data, params=query, files=files)
         logger.info(f'logid= {resp.headers["X-Tt-Logid"]} content= {resp.content}')
+        if resp.json()['code'] != 0:
+            logger.error(f'response = {resp.json()}')
+            raise Exception(f'OpenAPI 错误:{resp.json()}')
         return resp.json()
