@@ -9,7 +9,7 @@ logger.remove()
 app_id = "spring_ec9b314b50__c"
 
 # 通过 input() 函数接收用户输入的 content
-content = input("请输入: ")
+content = input("用户: ")
 
 # 初始化 AssistantClient
 client = AssistantClient()
