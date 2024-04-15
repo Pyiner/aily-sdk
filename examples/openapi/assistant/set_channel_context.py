@@ -6,16 +6,17 @@ from aily.openapi.assistant.beta import AssistantClient
 # logger.remove()
 
 # 固定的 app_id
-app_id = "spring_ec9b314b50__c"
-
-# 通过 input() 函数接收用户输入的 content
-content = input("用户: ")
+app_id = "spring_dd58222228__c"
+skill_id = "skill_37c515ad6a11"
+content = "谁是aPaaS产品负责人"
 
 # 初始化 AssistantClient
 client = AssistantClient()
 client.use_user_access_token(json.load(open('../../.env.json'))['user_access_token'])
 
-# 使用用户输入的 content 和固定的 app_id
-message = client.chat_completions.create(app_id=app_id, content=content)
+# 指定技能并传入参数
+message = client.chat_completions.create(app_id=app_id, content=content, skill_id=skill_id, skill_input={
+    'abc': "你好啊"
+}, channel_context={"xxx": "xxx"})
 
 print('Assistant:' + message.content)

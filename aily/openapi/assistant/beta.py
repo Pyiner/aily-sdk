@@ -1,3 +1,4 @@
+import json
 import time
 from loguru import logger
 from aily.openapi import OpenAPIClient
@@ -140,9 +141,10 @@ class ChatAPI:
     def __init__(self, client):
         self.client = client
 
-    def create(self, app_id: str, content: str,
+    def create(self, app_id: str, content: str, skill_id: Optional[str] = None, skill_input: Optional[dict] = None,
+               channel_context: Optional[dict] = None, meta_data: Optional[dict] = None,
                timeout: int = 60, poll_interval: int = 1) -> Message:
-        session = self.client.sessions.create(channel_context={}, metadata={})
+        session = self.client.sessions.create(channel_context=channel_context, metadata=meta_data)
 
         # 创建消息
         self.client.messages.create(
@@ -151,7 +153,7 @@ class ChatAPI:
         )
 
         # 创建运行
-        run = self.client.runs.create(session_id=session.id, app_id=app_id)
+        run = self.client.runs.create(session_id=session.id, app_id=app_id, skill_id=skill_id, skill_input=skill_input)
 
         # 轮询判断运行状态
         start_time = time.time()
@@ -200,9 +202,9 @@ class AssistantClient(OpenAPIClient):
         url = f"{self.base_url}/sessions"
         data = {}
         if channel_context:
-            data["channel_context"] = channel_context
+            data["channel_context"] = json.dumps(channel_context)
         if metadata:
-            data["metadata"] = metadata
+            data["metadata"] = json.dumps(metadata)
         try:
             response = self.post(url, data=data)
             logger.debug(response)
@@ -338,7 +340,7 @@ class AssistantClient(OpenAPIClient):
         if skill_id:
             data["skill_id"] = skill_id
         if skill_input:
-            data["skill_input"] = skill_input
+            data["skill_input"] = json.dumps(skill_input)
         if metadata:
             data["metadata"] = metadata
         try:
