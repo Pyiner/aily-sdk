@@ -69,7 +69,7 @@ class Run:
 
 class RunStep:
     def __init__(self, step_id: str, run_id: str, step_type: str, status: str,
-                 created_at: datetime, completed_at: Optional[int] = None,
+                 created_at: int, completed_at: Optional[int] = None,
                  expired_at: Optional[int] = None, failed_at: Optional[int] = None,
                  last_error: Optional[dict] = None, step_details: Optional[dict] = None,
                  usage: Optional[dict] = None):
@@ -451,12 +451,13 @@ class AssistantClient(OpenAPIClient):
                     run_id=step_data["run_id"],
                     step_type=step_data["type"],
                     status=step_data["status"],
-                    created_at=datetime.fromtimestamp(int(step_data["created_at"]) / 1000),
-                    completed_at=datetime.fromtimestamp(int(step_data["completed_at"]) / 1000) if step_data.get(
+                    created_at=int(step_data["created_at"]) if step_data.get(
+                        "created_at") else None,
+                    completed_at=int(step_data["completed_at"]) if step_data.get(
                         "completed_at") else None,
-                    expired_at=datetime.fromtimestamp(int(step_data["expired_at"]) / 1000) if step_data.get(
+                    expired_at=int(step_data["expired_at"]) if step_data.get(
                         "expired_at") else None,
-                    failed_at=datetime.fromtimestamp(int(step_data["failed_at"]) / 1000) if step_data.get(
+                    failed_at=int(step_data["failed_at"]) if step_data.get(
                         "failed_at") else None,
                     last_error=step_data.get("last_error"),
                     step_details=step_data.get("step_details"),
@@ -471,14 +472,18 @@ class AssistantClient(OpenAPIClient):
 
     def upload_file(self, name: str, mime_type: str, file) -> dict:
         logger.info(f"Uploading file: {name}")
-        url = f"{self.base_url}/file"
-        files = {
+        url = f"{self.base_url}/files"
+        data = {
             "name": name,
             "mime_type": mime_type,
+        }
+
+        files = {
             "file": file
         }
         try:
-            response = self.post(url, files=files, headers={'Content-Type': 'multipart/form-data'})
+            response = self.post(url, data=data, files=files)
+            logger.info(response)
             logger.info(f"File uploaded successfully. File ID: {response['file']['id']}")
             return response["file"]
         except Exception as e:
