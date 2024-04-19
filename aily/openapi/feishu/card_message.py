@@ -18,12 +18,12 @@ class CardMessageClient(OpenAPIClient):
         url = "https://open.larkoffice.com/open-apis/im/v1/messages"
         params = {"receive_id_type": "open_id"}
         body = self.make_card_message(template_id, template_version_name, template_variable, receive_id=receive_id)
-        return CardMessageResult(self.post(url, data=body, query=params))
+        return CardMessageResult(self.post(url, json=body, query=params))
 
     def reply_message(self, template_id, template_version_name, template_variable, message_id):
         url = f'https://open.larkoffice.com/open-apis/im/v1/messages/{message_id}/reply'
         body = self.make_card_message(template_id, template_version_name, template_variable, message_id=message_id)
-        return CardMessageResult(self.post(url, data=body))
+        return CardMessageResult(self.post(url, json=body))
 
     @staticmethod
     def make_card_message(template_id, template_version_name, template_variable, receive_id=None,

@@ -47,7 +47,7 @@ class Session:
         }
 
         try:
-            response = self.client.post(url, data=data)
+            response = self.client.post(url, json=data)
             self.session_id = response.get('data', {}).get('session_id')
             return self
         except Exception as e:
@@ -84,7 +84,7 @@ class Session:
             data['channel_context'] = skill_id
 
         # 调用 client 的 post 方法发送请求
-        response = self.client.post(url, data=data)
+        response = self.client.post(url, json=data)
         return MessageResponse(
             code=response['code'], msg=response['msg'],
             intent_id=response.get('data', {}).get('intent_id'),
@@ -103,7 +103,7 @@ class Session:
         if last_operation_id:
             data['last_operation_id'] = last_operation_id
         # 调用 client 的 post 方法发送请求
-        response = self.client.post(url, data=data)
+        response = self.client.post(url, json=data)
 
         return OperationResponse(
             code=response['code'],

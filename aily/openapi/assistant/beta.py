@@ -206,7 +206,7 @@ class AssistantClient(OpenAPIClient):
         if metadata:
             data["metadata"] = json.dumps(metadata)
         try:
-            response = self.post(url, data=data)
+            response = self.post(url, json=data)
             logger.debug(response)
             session_data = response['data']["session"]
             logger.info(f"Session created successfully. Session ID: {session_data['id']}")
@@ -269,7 +269,7 @@ class AssistantClient(OpenAPIClient):
         if quote_message_id:
             data["quote_message_id"] = quote_message_id
         try:
-            response = self.post(url, data=data)
+            response = self.post(url, json=data)
             message_data = response['data']["message"]
             logger.info(f"Message created successfully. Message ID: {message_data['id']}")
             return Message(
@@ -344,7 +344,7 @@ class AssistantClient(OpenAPIClient):
         if metadata:
             data["metadata"] = metadata
         try:
-            response = self.post(url, data=data)
+            response = self.post(url, json=data)
             run_data = response['data']["run"]
             logger.info(f"Run created successfully. Run ID: {run_data['id']}")
             return Run(
@@ -477,13 +477,12 @@ class AssistantClient(OpenAPIClient):
             "name": name,
             "mime_type": mime_type,
         }
-
         files = {
             "file": file
         }
         try:
             response = self.post(url, data=data, files=files)
-            logger.info(response)
+            print(response)
             logger.info(f"File uploaded successfully. File ID: {response['file']['id']}")
             return response["file"]
         except Exception as e:

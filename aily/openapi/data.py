@@ -79,7 +79,7 @@ class DataClient(OpenAPIClient):
         del query_params['app_id']
 
         # 调用 client 的 post 方法发送请求
-        return SQLDataResult(self.post(url, data=query_params))
+        return SQLDataResult(self.post(url, json=query_params))
 
     def write(self, data):
         # 构建请求的 URL
@@ -89,7 +89,7 @@ class DataClient(OpenAPIClient):
         del data['app_id']
         data['records'] = json.dumps(data['records'])
         # 调用 client 的 post 方法发送请求
-        return OperationResult(self.post(url, data=data))
+        return OperationResult(self.post(url, json=data))
 
     def remove(self, data):
         # 构建请求的 URL
@@ -99,4 +99,4 @@ class DataClient(OpenAPIClient):
         del data['app_id']
         data['records'] = json.dumps(data['records'])
         # 调用 client 的 post 方法发送请求
-        return OperationResult(self.post(url, data=data))
+        return OperationResult(self.post(url, json=data))
