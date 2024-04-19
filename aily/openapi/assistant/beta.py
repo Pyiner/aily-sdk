@@ -470,21 +470,16 @@ class AssistantClient(OpenAPIClient):
             logger.error(f"Error listing run steps: {str(e)}")
             raise
 
-    def upload_file(self, name: str, mime_type: str, file) -> dict:
-        logger.info(f"Uploading file: {name}")
+    def upload_file(self, files) -> dict:
         url = f"{self.base_url}/files"
-        data = {
-            "name": name,
-            "mime_type": mime_type,
-        }
-        files = {
-            "file": file
-        }
+        files_m = {}
+        for idx, file in enumerate(files):
+            files_m[f'file_{idx}'] = file
+
         try:
-            response = self.post(url, data=data, files=files)
-            print(response)
-            logger.info(f"File uploaded successfully. File ID: {response['file']['id']}")
-            return response["file"]
+            response = self.post(url, files=files_m)
+            logger.info(f"File uploaded successfully. Data: {response['data']}")
+            return response["data"]
         except Exception as e:
             logger.error(f"Error uploading file: {str(e)}")
             raise
