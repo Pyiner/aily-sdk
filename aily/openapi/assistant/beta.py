@@ -3,7 +3,7 @@ import time
 from loguru import logger
 from aily.openapi import OpenAPIClient
 
-from typing import List, Optional, Dict, Any, Generator
+from typing import List, Optional, Union, Any, Generator
 from datetime import datetime
 
 
@@ -173,7 +173,8 @@ class ChatAPI:
 
     def create(self, app_id: str, content: str, skill_id: Optional[str] = None, skill_input: Optional[dict] = None,
                channel_context: Optional[dict] = None, meta_data: Optional[dict] = None,
-               timeout: int = 60, poll_interval: int = 1, stream: bool = False) -> Generator[Any, Any, None] | Any:
+               timeout: int = 60, poll_interval: int = 1, stream: bool = False) -> Union[
+        Generator[Any, Any, None], Any]:
         session = self.client.sessions.create(channel_context=channel_context, metadata=meta_data)
 
         # 创建消息
