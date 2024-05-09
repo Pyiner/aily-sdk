@@ -51,6 +51,7 @@ class OpenAPIClient:
         _headers = {
             'Authorization': f'Bearer {self.token}',
             'Content-Type': 'application/json',
+            'User-Agent': 'Aily Python SDK'
         }
         if headers:
             _headers.update(headers)
@@ -66,6 +67,7 @@ class OpenAPIClient:
     def post(self, url, headers=None, data=None, query=None, files=None, json=None):
         _headers = {
             'Authorization': f'Bearer {self.token}',
+            'User-Agent': 'Aily Python SDK'
         }
         if headers:
             _headers.update(headers)

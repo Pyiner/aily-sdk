@@ -3,7 +3,7 @@ import time
 from loguru import logger
 from aily.openapi import OpenAPIClient
 
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any, Generator
 from datetime import datetime
 
 
@@ -111,8 +111,15 @@ class MessageAPI:
                                           file_ids, mentions, quote_message_id)
 
     def list(self, session_id: str, page_size: int = 20, page_token: Optional[str] = None,
-             run_id: Optional[str] = None) -> List[Message]:
-        return self.client.list_messages(session_id, page_size, page_token, run_id)
+             run_id: Optional[str] = None, with_partial_message=False) -> List[Message]:
+        has_more = True
+        page_token = None
+        total_messages = []
+        while has_more:
+            messages, has_more, page_token = self.client.list_messages(session_id, page_size, page_token, run_id,
+                                                                       with_partial_message)
+            total_messages.extend(messages)
+        return total_messages
 
 
 class RunAPI:
@@ -141,9 +148,32 @@ class ChatAPI:
     def __init__(self, client):
         self.client = client
 
+    def load_stream_message(self, run_id, session_id, timeout: int = 60, poll_interval: int = 1):
+        start_time = time.time()
+        while True:
+            run = self.client.runs.retrieve(session_id=session_id, run_id=run_id)
+            if run.status in ["COMPLETED", "FAILED", "CANCELLED", "EXPIRED"]:
+                messages = self.client.messages.list(session_id=session_id, run_id=run.id, with_partial_message=True)
+                for message in messages:
+                    if message.sender.sender_type == 'ASSISTANT':
+                        yield message
+                break
+
+            if run.status == 'IN_PROGRESS':
+                messages = self.client.messages.list(session_id=session_id, run_id=run.id, with_partial_message=True)
+                for message in messages:
+                    if message.sender.sender_type == 'ASSISTANT':
+                        yield message
+
+            elapsed_time = time.time() - start_time
+            if elapsed_time >= timeout:
+                logger.warning(f"Run {run.id} timed out after {timeout} seconds.")
+                break
+            time.sleep(poll_interval)
+
     def create(self, app_id: str, content: str, skill_id: Optional[str] = None, skill_input: Optional[dict] = None,
                channel_context: Optional[dict] = None, meta_data: Optional[dict] = None,
-               timeout: int = 60, poll_interval: int = 1) -> Message:
+               timeout: int = 60, poll_interval: int = 1, stream: bool = False) -> Generator[Any, Any, None] | Any:
         session = self.client.sessions.create(channel_context=channel_context, metadata=meta_data)
 
         # 创建消息
@@ -155,6 +185,9 @@ class ChatAPI:
         # 创建运行
         run = self.client.runs.create(session_id=session.id, app_id=app_id, skill_id=skill_id, skill_input=skill_input)
 
+        if stream:
+            return self.load_stream_message(session_id=session.id, run_id=run.id, timeout=timeout,
+                                            poll_interval=poll_interval)
         # 轮询判断运行状态
         start_time = time.time()
         while True:
@@ -295,22 +328,27 @@ class AssistantClient(OpenAPIClient):
             raise
 
     def list_messages(self, session_id: str, page_size: int = 20, page_token: Optional[str] = None,
-                      run_id: Optional[str] = None) -> List[Message]:
-        logger.info(f"Listing messages in session: {session_id}")
-        url = f"{self.base_url}/sessions/{session_id}/messages"
-        query = {"page_size": page_size}
+                      run_id: Optional[str] = None, with_partial_message: Optional[bool] = False) -> (
+            List[Message], bool, str):
+        logger.info(f'Listing messages in session: {session_id}')
+        url = f'{self.base_url}/sessions/{session_id}/messages'
+        query = {'page_size': page_size}
         if page_token:
-            query["page_token"] = page_token
+            query['page_token'] = page_token
         if run_id:
-            query["filter"] = {"run_id": run_id}
+            query['filter'] = {'run_id': run_id}
+        if with_partial_message:
+            query['with_partial_message'] = with_partial_message
         try:
             response = self.get(url, query=query)
             messages = []
-            for message_data in response['data']["messages"]:
+            has_more = response['data']['has_more']
+            page_token = response['data']['page_token']
+            for message_data in response['data']['messages']:
                 message = Message(
-                    message_id=message_data["id"],
-                    session_id=message_data["session_id"],
-                    content_type=message_data["content_type"],
+                    message_id=message_data['id'],
+                    session_id=message_data['session_id'],
+                    content_type=message_data['content_type'],
                     content=message_data["content"],
                     sender=Sender(
                         aily_id=message_data["sender"].get('aily_id'),
@@ -327,7 +365,7 @@ class AssistantClient(OpenAPIClient):
                 )
                 messages.append(message)
             logger.info(f"Listed {len(messages)} messages in session: {session_id}")
-            return messages
+            return messages, has_more, page_token
         except Exception as e:
             logger.error(f"Error listing messages: {str(e)}")
             raise
