@@ -110,11 +110,11 @@ class MessageAPI:
         return self.client.create_message(session_id, content, content_type, idempotent_id,
                                           file_ids, mentions, quote_message_id)
 
-    def list(self, session_id: str, page_size: int = 20, page_token: Optional[str] = None,
-             run_id: Optional[str] = None, with_partial_message=False) -> List[Message]:
+    def list(self, session_id: str, run_id: Optional[str] = None, with_partial_message=False) -> List[Message]:
         has_more = True
-        page_token = None
         total_messages = []
+        page_token = None
+        page_size = 20
         while has_more:
             messages, has_more, page_token = self.client.list_messages(session_id, page_size, page_token, run_id,
                                                                        with_partial_message)
