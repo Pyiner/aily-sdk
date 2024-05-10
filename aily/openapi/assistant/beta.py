@@ -93,8 +93,8 @@ class SessionAPI:
     def __init__(self, client):
         self.client = client
 
-    def create(self, channel_context=None, metadata=None) -> Session:
-        return self.client.create_session(channel_context, metadata)
+    def create(self, channel_context=None, metadata=None, unique_user_id=None) -> Session:
+        return self.client.create_session(channel_context, metadata, unique_user_id)
 
     def retrieve(self, session_id: str) -> Session:
         return self.client.retrieve_session(session_id)
@@ -173,9 +173,10 @@ class ChatAPI:
 
     def create(self, app_id: str, content: str, skill_id: Optional[str] = None, skill_input: Optional[dict] = None,
                channel_context: Optional[dict] = None, meta_data: Optional[dict] = None,
-               timeout: int = 60, poll_interval: int = 1, stream: bool = False) -> Union[
-        Generator[Any, Any, None], Any]:
-        session = self.client.sessions.create(channel_context=channel_context, metadata=meta_data)
+               timeout: int = 60, poll_interval: int = 1, stream: bool = False, unique_user_id: Optional[str] = None) -> \
+            Union[Generator[Any, Any, None], Any]:
+        session = self.client.sessions.create(channel_context=channel_context, metadata=meta_data,
+                                              biz_user_id=unique_user_id)
 
         # 创建消息
         self.client.messages.create(
@@ -231,7 +232,7 @@ class AssistantClient(OpenAPIClient):
         self.chat_completions = ChatAPI(self)
         self.files = FileAPI(self)  # 新增FileAPI
 
-    def create_session(self, channel_context=None, metadata=None) -> Session:
+    def create_session(self, channel_context=None, metadata=None, unique_user_id=None) -> Session:
         logger.info("Creating a new session...")
         url = f"{self.base_url}/sessions"
         data = {}
@@ -239,9 +240,12 @@ class AssistantClient(OpenAPIClient):
             data["channel_context"] = json.dumps(channel_context)
         if metadata:
             data["metadata"] = json.dumps(metadata)
+
+        headers = {}
+        if unique_user_id:
+            headers['X-Aily-BizUserID'] = unique_user_id
         try:
-            response = self.post(url, json=data)
-            logger.debug(response)
+            response = self.post(url, json=data, headers=headers)
             session_data = response['data']["session"]
             logger.info(f"Session created successfully. Session ID: {session_data['id']}")
             return Session(
