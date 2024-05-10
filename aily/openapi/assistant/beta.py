@@ -176,7 +176,7 @@ class ChatAPI:
                timeout: int = 60, poll_interval: int = 1, stream: bool = False, unique_user_id: Optional[str] = None) -> \
             Union[Generator[Any, Any, None], Message]:
         session = self.client.sessions.create(channel_context=channel_context, metadata=meta_data,
-                                              biz_user_id=unique_user_id)
+                                              unique_user_id=unique_user_id)
 
         # 创建消息
         self.client.messages.create(
