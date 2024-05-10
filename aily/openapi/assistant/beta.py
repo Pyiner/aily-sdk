@@ -344,11 +344,12 @@ class AssistantClient(OpenAPIClient):
             query['filter'] = {'run_id': run_id}
         if with_partial_message:
             query['with_partial_message'] = with_partial_message
+
         try:
             response = self.get(url, query=query)
             messages = []
-            has_more = response['data']['has_more']
-            page_token = response['data']['page_token']
+            has_more = response['data'].get('has_more')
+            new_page_token = response['data'].get('page_token')
             for message_data in response['data']['messages']:
                 message = Message(
                     message_id=message_data['id'],
@@ -370,7 +371,7 @@ class AssistantClient(OpenAPIClient):
                 )
                 messages.append(message)
             logger.info(f"Listed {len(messages)} messages in session: {session_id}")
-            return messages, has_more, page_token
+            return messages, has_more, new_page_token
         except Exception as e:
             logger.error(f"Error listing messages: {str(e)}")
             raise
