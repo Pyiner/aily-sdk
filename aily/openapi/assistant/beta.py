@@ -6,6 +6,8 @@ from aily.openapi import OpenAPIClient
 from typing import List, Optional, Union, Any, Generator
 from datetime import datetime
 
+from aily.openapi.assistant.errors import AilyTimeoutError
+
 
 class Session:
     def __init__(self, session_id: str, created_at: int, metadata: Optional[str] = None):
@@ -168,7 +170,7 @@ class ChatAPI:
             elapsed_time = time.time() - start_time
             if elapsed_time >= timeout:
                 logger.warning(f"Run {run.id} timed out after {timeout} seconds.")
-                break
+                raise AilyTimeoutError(f"Run {run.id} timed out after {timeout} seconds.")
             time.sleep(poll_interval)
 
     def create(self, app_id: str, content: str, skill_id: Optional[str] = None, skill_input: Optional[dict] = None,
@@ -199,8 +201,7 @@ class ChatAPI:
 
             elapsed_time = time.time() - start_time
             if elapsed_time >= timeout:
-                logger.warning(f"Run {run.id} timed out after {timeout} seconds.")
-                break
+                raise AilyTimeoutError(f"Run {run.id} timed out after {timeout} seconds.")
 
             time.sleep(poll_interval)
 

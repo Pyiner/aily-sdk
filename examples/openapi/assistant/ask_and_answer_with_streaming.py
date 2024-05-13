@@ -1,6 +1,7 @@
 import json
 from loguru import logger
 from aily.openapi.assistant.beta import AssistantClient
+from aily.openapi.assistant.errors import AilyTimeoutError
 
 # 关闭 loguru 的日志输出
 logger.remove()
@@ -18,5 +19,9 @@ skill_id = 'skill_2512705ef9da'
 # 使用用户输入的 content 和固定的 app_id
 stream = client.chat_completions.create(app_id=app_id, content=content, skill_id=skill_id, stream=True)
 
-for msg in stream:
-    print(msg.content)
+try:
+    for msg in stream:
+        print(msg.content)
+except AilyTimeoutError as e:
+    # 处理超时的情况
+    print(e)
